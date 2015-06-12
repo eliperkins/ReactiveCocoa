@@ -24,7 +24,7 @@ typedef RACStream * (^RACStreamBindBlock)(id value, BOOL *stop);
 ///
 /// When subclassing RACStream, only the methods in the main @interface body need
 /// to be overridden.
-@interface RACStream : NSObject
+@interface RACStream<T> : NSObject
 
 /// Returns an empty stream.
 + (instancetype)empty;
@@ -32,7 +32,7 @@ typedef RACStream * (^RACStreamBindBlock)(id value, BOOL *stop);
 /// Lifts `value` into the stream monad.
 ///
 /// Returns a stream containing only the given value.
-+ (instancetype)return:(id)value;
++ (instancetype)return:(T)value;
 
 /// Lazily binds a block to the values in the receiver.
 ///
@@ -93,7 +93,7 @@ typedef RACStream * (^RACStreamBindBlock)(id value, BOOL *stop);
 ///
 /// These methods do not need to be overridden, although subclasses may
 /// occasionally gain better performance from doing so.
-@interface RACStream (Operations)
+@interface RACStream<T> (Operations)
 
 /// Maps `block` across the values in the receiver and flattens the result.
 ///
@@ -122,7 +122,7 @@ typedef RACStream * (^RACStreamBindBlock)(id value, BOOL *stop);
 ///
 /// Returns a new stream which represents the combined streams resulting from
 /// mapping `block`.
-- (instancetype)flattenMap:(RACStream * (^)(id value))block;
+- (instancetype)flattenMap:(RACStream * (^)(T value))block;
 
 /// Flattens a stream of streams.
 ///
@@ -137,7 +137,7 @@ typedef RACStream * (^RACStreamBindBlock)(id value, BOOL *stop);
 /// This corresponds to the `Select` method in Rx.
 ///
 /// Returns a new stream with the mapped values.
-- (instancetype)map:(id (^)(id value))block;
+- (instancetype)map:(id (^)(T value))block;
 
 /// Replaces each value in the receiver with the given object.
 ///
@@ -150,7 +150,7 @@ typedef RACStream * (^RACStreamBindBlock)(id value, BOOL *stop);
 /// This corresponds to the `Where` method in Rx.
 ///
 /// Returns a new stream with only those values that passed.
-- (instancetype)filter:(BOOL (^)(id value))block;
+- (instancetype)filter:(BOOL (^)(T value))block;
 
 /// Filters out values in the receiver that equal (via -isEqual:) the provided value.
 ///
@@ -158,7 +158,7 @@ typedef RACStream * (^RACStreamBindBlock)(id value, BOOL *stop);
 ///
 /// Returns a new stream containing only the values which did not compare equal
 /// to `value`.
-- (instancetype)ignore:(id)value;
+- (instancetype)ignore:(T)value;
 
 /// Unpacks each RACTuple in the receiver and maps the values to a new value.
 ///
@@ -172,7 +172,7 @@ typedef RACStream * (^RACStreamBindBlock)(id value, BOOL *stop);
 
 /// Returns a stream consisting of `value`, followed by the values in the
 /// receiver.
-- (instancetype)startWith:(id)value;
+- (instancetype)startWith:(T)value;
 
 /// Skips the first `skipCount` values in the receiver.
 ///
@@ -252,7 +252,7 @@ typedef RACStream * (^RACStreamBindBlock)(id value, BOOL *stop);
 ///
 /// Returns a new stream that consists of each application of `reduceBlock`. If the
 /// receiver is empty, an empty stream is returned.
-- (instancetype)scanWithStart:(id)startingValue reduce:(id (^)(id running, id next))reduceBlock;
+- (instancetype)scanWithStart:(id)startingValue reduce:(id (^)(id running, T next))reduceBlock;
 
 /// Combines values in the receiver from left to right using the given block
 /// which also takes zero-based index of the values.
@@ -266,7 +266,7 @@ typedef RACStream * (^RACStreamBindBlock)(id value, BOOL *stop);
 ///
 /// Returns a new stream that consists of each application of `reduceBlock`. If the
 /// receiver is empty, an empty stream is returned.
-- (instancetype)scanWithStart:(id)startingValue reduceWithIndex:(id (^)(id running, id next, NSUInteger index))reduceBlock;
+- (instancetype)scanWithStart:(id)startingValue reduceWithIndex:(id (^)(id running, T next, NSUInteger index))reduceBlock;
 
 /// Combines each previous and current value into one object.
 ///
@@ -290,35 +290,35 @@ typedef RACStream * (^RACStreamBindBlock)(id value, BOOL *stop);
 ///
 /// Returns a new stream consisting of the return values from each application of
 /// `reduceBlock`.
-- (instancetype)combinePreviousWithStart:(id)start reduce:(id (^)(id previous, id current))reduceBlock;
+- (instancetype)combinePreviousWithStart:(id)start reduce:(id (^)(id previous, T current))reduceBlock;
 
 /// Takes values until the given block returns `YES`.
 ///
 /// Returns a stream of the initial values in the receiver that fail `predicate`.
 /// If `predicate` never returns `YES`, a stream equivalent to the receiver is
 /// returned.
-- (instancetype)takeUntilBlock:(BOOL (^)(id x))predicate;
+- (instancetype)takeUntilBlock:(BOOL (^)(T x))predicate;
 
 /// Takes values until the given block returns `NO`.
 ///
 /// Returns a stream of the initial values in the receiver that pass `predicate`.
 /// If `predicate` never returns `NO`, a stream equivalent to the receiver is
 /// returned.
-- (instancetype)takeWhileBlock:(BOOL (^)(id x))predicate;
+- (instancetype)takeWhileBlock:(BOOL (^)(T x))predicate;
 
 /// Skips values until the given block returns `YES`.
 ///
 /// Returns a stream containing the values of the receiver that follow any
 /// initial values failing `predicate`. If `predicate` never returns `YES`,
 /// an empty stream is returned.
-- (instancetype)skipUntilBlock:(BOOL (^)(id x))predicate;
+- (instancetype)skipUntilBlock:(BOOL (^)(T x))predicate;
 
 /// Skips values until the given block returns `NO`.
 ///
 /// Returns a stream containing the values of the receiver that follow any
 /// initial values passing `predicate`. If `predicate` never returns `NO`, an
 /// empty stream is returned.
-- (instancetype)skipWhileBlock:(BOOL (^)(id x))predicate;
+- (instancetype)skipWhileBlock:(BOOL (^)(T x))predicate;
 
 /// Returns a stream of values for which -isEqual: returns NO when compared to the
 /// previous value.
